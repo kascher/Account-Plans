@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Mission__c</fullName>
+    <externalId>false</externalId>
+    <inlineHelpText>A company mission statement is a concise explanation of an organization&apos;s reason for existence. It describes the company&apos;s purpose, intention, and overall objectives.</inlineHelpText>
+    <label>Mission</label>
+    <length>255</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
