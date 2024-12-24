@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Use a variety of sources and methods to create Strengths for the SWOT part of the Account Plan.</description>
+    <developerName>Account_Plan_Strengths</developerName>
+    <masterLabel>Account Plan Strengths</masterLabel>
+    <relatedEntity>AccountPlan</relatedEntity>
+    <relatedField>AccountPlan.RelationshipStrengths</relatedField>
+    <templateVersions>
+        <content>You&apos;re an Account Executive at {!$Organization.Name} that sells SaaS and consulting services to small and medium-sized companies. You&apos;re working on your Account Plans for next year and need to determine your strengths with the Account as part of a SWOT (strengths, weaknesses, opportunity, and threat) analysis.
+
+To determine strengths, review the following:
+Closed won opportunities, deal size, product usage, and revenue growth.
+Customer Success Metrics: Assess customer satisfaction (e.g., Net Promoter Score), product adoption rates, and success stories with this account.
+{!$EinsteinSearch:Default_FileUDMO_SI_Retriever_1Cx_moo77464bd9.results}
+</content>
+        <inputs>
+            <apiName>RelatedEntity</apiName>
+            <definition>SOBJECT://AccountPlan</definition>
+            <referenceName>Input:AccountPlan</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT35Turbo</primaryModel>
+        <status>Draft</status>
+        <templateDataProviders>
+            <definition>invocable://getEinsteinRetrieverResults/Default_FileUDMO_SI_Retriever_1Cx_moo77464bd9</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>searchText</parameterName>
+                <valueExpression>hi there</valueExpression>
+            </parameters>
+            <referenceName>EinsteinSearch:Default_FileUDMO_SI_Retriever_1Cx_moo77464bd9</referenceName>
+        </templateDataProviders>
+        <versionNumber>1</versionNumber>
+    </templateVersions>
+    <type>einstein_gpt__fieldCompletion</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

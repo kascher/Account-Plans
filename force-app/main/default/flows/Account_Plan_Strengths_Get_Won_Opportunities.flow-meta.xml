@@ -4,7 +4,7 @@
         <name>Add_Quotes_to_OpportunityLineItems</name>
         <label>Add Quotes to OpportunityLineItems</label>
         <locationX>352</locationX>
-        <locationY>1190</locationY>
+        <locationY>1406</locationY>
         <actionName>AddDoubleQuotesAction</actionName>
         <actionType>apex</actionType>
         <connector>
@@ -27,7 +27,7 @@
         <name>Add_This_Opp_s_Competitor</name>
         <label>Add This Opp&apos;s Competitor</label>
         <locationX>352</locationX>
-        <locationY>674</locationY>
+        <locationY>890</locationY>
         <assignmentItems>
             <assignToReference>ThisOppsCompetitor</assignToReference>
             <operator>Assign</operator>
@@ -40,11 +40,27 @@
         </connector>
     </assignments>
     <assignments>
+        <name>Add_to_Iterable</name>
+        <label>Add to Iterable</label>
+        <locationX>484</locationX>
+        <locationY>566</locationY>
+        <assignmentItems>
+            <assignToReference>OppIterable</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <numberValue>1.0</numberValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Check_Loop_Limit</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
         <description>Next step is to create a json template to create an Opp object with Competitor and Products organized together.</description>
         <name>Add_to_ThisOppProductList</name>
         <label>Add to ThisOppProductList</label>
         <locationX>440</locationX>
-        <locationY>998</locationY>
+        <locationY>1214</locationY>
         <assignmentItems>
             <assignToReference>ThisOppProductList</assignToReference>
             <operator>Add</operator>
@@ -60,9 +76,9 @@
         <name>Aggregate_OppText</name>
         <label>Aggregate OppText</label>
         <locationX>352</locationX>
-        <locationY>1298</locationY>
+        <locationY>1514</locationY>
         <assignmentItems>
-            <assignToReference>OpportunitiesText</assignToReference>
+            <assignToReference>OpportunitiesJSONSubText</assignToReference>
             <operator>Add</operator>
             <value>
                 <elementReference>OpportunityJSONsub</elementReference>
@@ -76,7 +92,7 @@
         <name>Set_Comma_to_false</name>
         <label>Set Comma to false</label>
         <locationX>352</locationX>
-        <locationY>1406</locationY>
+        <locationY>1622</locationY>
         <assignmentItems>
             <assignToReference>CommaBoolean</assignToReference>
             <operator>Assign</operator>
@@ -92,7 +108,7 @@
         <name>Set_Comma_to_True</name>
         <label>Set Comma to True</label>
         <locationX>352</locationX>
-        <locationY>566</locationY>
+        <locationY>782</locationY>
         <assignmentItems>
             <assignToReference>CommaBoolean</assignToReference>
             <operator>Assign</operator>
@@ -109,7 +125,7 @@
         <elementSubtype>AddPromptInstructions</elementSubtype>
         <label>Write the JSON</label>
         <locationX>352</locationX>
-        <locationY>1514</locationY>
+        <locationY>1730</locationY>
         <assignmentItems>
             <assignToReference>$Output.Prompt</assignToReference>
             <operator>Add</operator>
@@ -127,7 +143,7 @@
         <elementSubtype>FilterCollectionProcessor</elementSubtype>
         <label>Filter this Opp&apos;s Products</label>
         <locationX>352</locationX>
-        <locationY>782</locationY>
+        <locationY>998</locationY>
         <assignNextValueToReference>currentItem_Filter_this_Opp_s_Products</assignNextValueToReference>
         <collectionProcessorType>FilterCollectionProcessor</collectionProcessorType>
         <collectionReference>Get_OpportunityLineItems</collectionReference>
@@ -143,6 +159,36 @@
             <targetReference>Loop_This_Opp_s_Products</targetReference>
         </connector>
     </collectionProcessors>
+    <constants>
+        <description>Flow Text Variables have 4,000 character limit.</description>
+        <name>OppLoopLimit</name>
+        <dataType>Number</dataType>
+        <value>
+            <numberValue>8.0</numberValue>
+        </value>
+    </constants>
+    <decisions>
+        <name>Check_Loop_Limit</name>
+        <label>Check Loop Limit</label>
+        <locationX>484</locationX>
+        <locationY>674</locationY>
+        <defaultConnectorLabel>Reached Limit</defaultConnectorLabel>
+        <rules>
+            <name>Hasn_t_Reached_Limit</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>OppIterable</leftValueReference>
+                <operator>LessThan</operator>
+                <rightValue>
+                    <elementReference>OppLoopLimit</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Comma_to_True</targetReference>
+            </connector>
+            <label>Hasn&apos;t Reached Limit</label>
+        </rules>
+    </decisions>
     <description>Gets Closed Won Opportunities with Products and Competitors for use in the Account Plan  Strengths Field Generation Prompt Template.</description>
     <environments>Default</environments>
     <formulas>
@@ -160,14 +206,14 @@
         <collectionReference>Get_Won_Opps</collectionReference>
         <iterationOrder>Asc</iterationOrder>
         <nextValueConnector>
-            <targetReference>Set_Comma_to_True</targetReference>
+            <targetReference>Add_to_Iterable</targetReference>
         </nextValueConnector>
     </loops>
     <loops>
         <name>Loop_This_Opp_s_Products</name>
         <label>Loop This Opp&apos;s Products</label>
         <locationX>352</locationX>
-        <locationY>890</locationY>
+        <locationY>1106</locationY>
         <collectionReference>Filter_this_Opp_s_Products</collectionReference>
         <iterationOrder>Asc</iterationOrder>
         <nextValueConnector>
@@ -258,6 +304,8 @@
         </filters>
         <getFirstRecordOnly>false</getFirstRecordOnly>
         <object>Opportunity</object>
+        <sortField>CloseDate</sortField>
+        <sortOrder>Desc</sortOrder>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <start>
@@ -288,7 +336,9 @@
       &quot;StageName&quot;: &quot;{!Loop_Opportunities.StageName}&quot;,
       &quot;CloseDate&quot;: &quot;{!Loop_Opportunities.CloseDate}&quot;,
       &quot;CompetitorId&quot;: &quot;{!Loop_Opportunities.SDO_Sales_Competitor__c}&quot;,
-      &quot;OpportunityLineItemIds&quot;: {!Add_Quotes_to_OpportunityLineItems.modifiedCollection}
+      &quot;OpportunityLineItemIds&quot;: {!Add_Quotes_to_OpportunityLineItems.modifiedCollection},
+       &quot;Amount&quot;: {!Loop_Opportunities.Amount},
+       &quot;Age&quot;: {!Loop_Opportunities.AgeInDays}
     }{!CommaFormula}</text>
     </textTemplates>
     <transforms>
@@ -337,7 +387,28 @@
         <objectType>OpportunityLineItem</objectType>
     </variables>
     <variables>
-        <name>OpportunitiesText</name>
+        <description>Opportunity Loop Counter</description>
+        <name>OppIterable</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+        <value>
+            <numberValue>0.0</numberValue>
+        </value>
+    </variables>
+    <variables>
+        <description>The Text variable holding the individual Opportunity info.</description>
+        <name>OpportunitiesJSONSubText</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>The &quot;wrapper&quot; text holding the individual Opportunity Info.</description>
+        <name>OpportunityMasterJSONText</name>
         <dataType>String</dataType>
         <isCollection>false</isCollection>
         <isInput>false</isInput>
