@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <activeVersion>1</activeVersion>
     <description>Use a variety of sources and methods to create Strengths for the SWOT part of the Account Plan.</description>
     <developerName>Account_Plan_Strengths</developerName>
     <masterLabel>Account Plan Strengths</masterLabel>
     <relatedEntity>AccountPlan</relatedEntity>
     <relatedField>AccountPlan.RelationshipStrengths</relatedField>
     <templateVersions>
-        <content>You&apos;re an Account Executive at {!$Organization.Name} that sells SaaS and consulting services to small and medium-sized companies. You&apos;re working on your Account Plans for next year and need to determine your strengths with the Account as part of a SWOT (strengths, weaknesses, opportunity, and threat) analysis.
+        <content>You&apos;re an Account Executive at {!$Organization.Name}. You&apos;re working on your Account Plans for your biggest and most important accounts next year and need to determine your strengths with the Account as part of a SWOT (strengths, weaknesses, opportunity, and threat) analysis.
 
 To determine strengths, review the following:
-Closed won opportunities, deal size, product usage, and revenue growth.
-Customer Success Metrics: Assess customer satisfaction (e.g., Net Promoter Score), product adoption rates, and success stories with this account.
-{!$EinsteinSearch:Default_FileUDMO_SI_Retriever_1Cx_moo77464bd9.results}
+JSON output from {!$Flow:Account_Plan_Strengths_Get_Won_Opportunities.Prompt}
+Customer Success Metrics: The average Net Promoter Score for {!$Input:AccountPlan.Account.Name} is {!$Flow:Account_Plan_Strenghts_Calculate_NPS.Prompt}
+
+Also assess product adoption rates, and success stories with this account.
+
+
+
+
 </content>
         <inputs>
             <apiName>RelatedEntity</apiName>
@@ -20,16 +26,26 @@ Customer Success Metrics: Assess customer satisfaction (e.g., Net Promoter Score
             <required>true</required>
         </inputs>
         <primaryModel>sfdc_ai__DefaultOpenAIGPT35Turbo</primaryModel>
-        <status>Draft</status>
+        <status>Published</status>
         <templateDataProviders>
-            <definition>invocable://getEinsteinRetrieverResults/Default_FileUDMO_SI_Retriever_1Cx_moo77464bd9</definition>
+            <definition>flow://Account_Plan_Strengths_Get_Won_Opportunities</definition>
             <parameters>
-                <definition>primitive://String</definition>
+                <definition>SOBJECT://AccountPlan</definition>
                 <isRequired>true</isRequired>
-                <parameterName>searchText</parameterName>
-                <valueExpression>hi there</valueExpression>
+                <parameterName>RelatedEntity</parameterName>
+                <valueExpression>{!$Input:AccountPlan}</valueExpression>
             </parameters>
-            <referenceName>EinsteinSearch:Default_FileUDMO_SI_Retriever_1Cx_moo77464bd9</referenceName>
+            <referenceName>Flow:Account_Plan_Strengths_Get_Won_Opportunities</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>flow://Account_Plan_Strenghts_Calculate_NPS</definition>
+            <parameters>
+                <definition>SOBJECT://AccountPlan</definition>
+                <isRequired>true</isRequired>
+                <parameterName>RelatedEntity</parameterName>
+                <valueExpression>{!$Input:AccountPlan}</valueExpression>
+            </parameters>
+            <referenceName>Flow:Account_Plan_Strenghts_Calculate_NPS</referenceName>
         </templateDataProviders>
         <versionNumber>1</versionNumber>
     </templateVersions>
